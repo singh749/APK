@@ -13,7 +13,7 @@ version = 1.0.0
 
 # ---------------------------------------------------------------- python deps
 # requests needs: urllib3, charset-normalizer, idna, certifi
-requirements = python3,kivy==2.3.0,requests,urllib3,charset-normalizer,idna,certifi,pillow,plyer,android
+requirements = python3,kivy,requests,urllib3,charset-normalizer,idna,certifi,pillow,plyer,android
 
 orientation = portrait
 fullscreen = 0
