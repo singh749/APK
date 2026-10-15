@@ -38,24 +38,42 @@ jobs:
       - name: Install Buildozer
         run: |
           python -m pip install --upgrade pip setuptools wheel
-          pip install buildozer==1.5.0 "cython==3.0.10"
+          pip install "git+https://github.com/kivy/buildozer.git@master" "cython==3.0.10"
 
       - name: Cache Buildozer global directory
         uses: actions/cache@v4
         with:
           path: ~/.buildozer
-          key: buildozer-global-${{ hashFiles('buildozer.spec') }}
-          restore-keys: buildozer-global-
+          key: buildozer-global-v2-${{ hashFiles('buildozer.spec') }}
+          restore-keys: buildozer-global-v2-
 
       - name: Cache Buildozer project directory
         uses: actions/cache@v4
         with:
           path: .buildozer
-          key: buildozer-local-${{ hashFiles('buildozer.spec') }}
-          restore-keys: buildozer-local-
+          key: buildozer-local-v2-${{ hashFiles('buildozer.spec') }}
+          restore-keys: buildozer-local-v2-
 
       - name: Build debug APK
-        run: buildozer android debug
+        run: |
+          set -o pipefail
+          buildozer android debug 2>&1 | tee build.log
+
+      - name: Report failure details
+        if: failure()
+        run: |
+          {
+            echo "## Buildozer failure log (tail)"
+            echo '```'
+            tail -n 200 build.log 2>/dev/null || echo "no build.log"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          enc() { sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}'; }
+          tail_msg=$(tail -n 60 build.log 2>/dev/null | enc); tail_msg="${tail_msg:0:3800}"
+          err_msg=$(grep -niE "error|exception|fatal|failed" build.log 2>/dev/null | tail -n 25 | enc); err_msg="${err_msg:0:3800}"
+          [ -n "$tail_msg" ] && echo "::error title=Buildozer log tail::${tail_msg}"
+          [ -n "$err_msg" ] && echo "::error title=Buildozer error lines::${err_msg}"
+          true
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
