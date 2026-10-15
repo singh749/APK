@@ -1,0 +1,5 @@
+# For running/testing the app on desktop (not needed for the APK build)
+kivy==2.3.0
+requests
+pillow
+plyer
