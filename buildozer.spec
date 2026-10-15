@@ -34,7 +34,9 @@ android.accept_sdk_license = True
 android.enable_androidx = True
 
 # ---------------------------------------------------------------- p4a
-p4a.branch = master
+# develop branch contains the fix for the venv pip corruption bug
+# (kivy/python-for-android#3364, fixed by PR #3360 - merged 2026-07-30)
+p4a.branch = develop
 p4a.bootstrap = sdl2
 
 [buildozer]
